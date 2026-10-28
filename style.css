@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap");
 
 :root {
   --paper: rgba(250, 247, 237, 0.97);
@@ -41,6 +41,17 @@ button {
   touch-action: none;
 }
 
+#worldForeground {
+  position: fixed;
+  z-index: 3;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
 #world.dragging-map {
   cursor: grabbing;
 }
@@ -59,12 +70,28 @@ button {
     radial-gradient(ellipse at center, transparent 55%, rgba(28, 43, 43, 0.11));
 }
 
-.topbar,
-.side-menu,
-.resident-panel,
-.map-controls {
+#characterAnimations {
   position: fixed;
   z-index: 2;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.walking-sprite {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+  object-fit: fill;
+  pointer-events: none;
+}
+
+.topbar,
+.side-menu,
+.resident-panel {
+  position: fixed;
+  z-index: 4;
   border: 1px solid rgba(255, 255, 255, 0.64);
   background: var(--paper);
   box-shadow: var(--shadow);
@@ -243,33 +270,6 @@ button {
   transition: width 0.25s;
 }
 
-.map-controls {
-  right: 14px;
-  bottom: 190px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px;
-  border-radius: 2px;
-}
-
-.map-controls span {
-  color: var(--muted);
-  font-size: 10px;
-}
-
-.map-controls button {
-  width: 29px;
-  height: 27px;
-  border: 0;
-  background: #e9eddf;
-  font-size: 16px;
-}
-
-.map-controls button:hover {
-  background: #dce5d5;
-}
-
 .resident-panel {
   left: 14px;
   bottom: 14px;
@@ -326,15 +326,11 @@ button {
   font-size: 8px;
 }
 
-.map-hint {
-  position: fixed;
-  z-index: 1;
-  right: 15px;
-  bottom: 154px;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 10px;
-  text-shadow: 0 1px 3px #263b38;
-  pointer-events: none;
+.resident-portrait {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  image-rendering: pixelated;
 }
 
 .toast {
@@ -491,6 +487,13 @@ button {
   font-size: 42px;
 }
 
+.result-portrait {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
 .result-name {
   margin-top: 2px;
   font-weight: bold;
@@ -552,6 +555,14 @@ button {
 
 .codex-item .emoji {
   font-size: 24px;
+}
+
+.codex-item .character-portrait {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  image-rendering: pixelated;
 }
 
 .codex-item small {
@@ -677,19 +688,6 @@ button {
     font-size: 8px;
   }
 
-  .map-controls {
-    right: 8px;
-    bottom: 150px;
-  }
-
-  .map-hint {
-    right: 8px;
-    bottom: 124px;
-    max-width: 190px;
-    text-align: right;
-    font-size: 8px;
-  }
-
   .resident-panel {
     left: 8px;
     right: 8px;
@@ -716,7 +714,4 @@ button {
     width: 150px;
   }
 
-  .map-controls span {
-    display: none;
-  }
 }
