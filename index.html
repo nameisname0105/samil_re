@@ -12,15 +12,16 @@
   <div class="screen-shade" aria-hidden="true"></div>
   <div id="characterAnimations" aria-hidden="true"></div>
   <canvas id="worldForeground" aria-hidden="true"></canvas>
+  <div id="dayNightOverlay" aria-hidden="true"></div>
 
   <header class="topbar">
-    <div class="brand">
-      <div class="brand-mark">✳</div>
+    <button class="brand profile-trigger" id="openProfile" type="button" aria-label="프로필 열기">
+      <span class="brand-mark" id="profileAvatarSmall" aria-hidden="true">✳</span>
       <div>
-        <h1>포근한 눈꽃 마을</h1>
-        <p>작은 겨울의 큰 행복</p>
+        <h1 id="profileName">포근한 눈꽃 마을</h1>
+        <p id="profileStatusPreview">작은 겨울의 큰 행복</p>
       </div>
-    </div>
+    </button>
 
     <div class="top-stats">
       <div class="stat">
@@ -38,37 +39,71 @@
     </div>
   </header>
 
-  <aside class="side-menu">
-    <div class="menu-heading">마을 안내</div>
+  <div class="side-menu-stack">
+    <aside class="side-menu">
+      <div class="menu-heading">마을 안내</div>
 
-    <button class="menu-button" id="openSummon">
-      <span class="button-symbol">🎁</span>
-      <span class="button-label">
-        <strong>선물 상자</strong>
-        <small>새로운 친구 만나기</small>
-      </span>
-      <span class="button-cost">❄ 500</span>
+      <button class="menu-button" id="openSummon">
+        <span class="button-symbol">🎁</span>
+        <span class="button-label">
+          <strong>선물 상자</strong>
+          <small>새로운 친구 만나기</small>
+        </span>
+        <span class="button-cost">❄ 500</span>
+      </button>
+
+      <button class="menu-button" id="openCodex">
+        <span class="button-symbol">✦</span>
+        <span class="button-label">
+          <strong>친구 도감</strong>
+          <small id="collectionCount">1 / 8 발견</small>
+        </span>
+      </button>
+
+      <button class="menu-button" id="openMiniGames">
+        <span class="button-symbol">🎮</span>
+        <span class="button-label">
+          <strong>미니게임</strong>
+          <small>겨울 놀이 즐기기</small>
+        </span>
+      </button>
+
+      <div class="side-note">
+        <span class="note-title">오늘의 소원</span>
+        <p id="questText">친구를 한 명 만나보세요.</p>
+        <div class="quest-track"><div id="questBar"></div></div>
+      </div>
+    </aside>
+    <button id="uiToggle" type="button" aria-expanded="true">
+      UI 숨기기
     </button>
+  </div>
 
-    <button class="menu-button" id="openCodex">
-      <span class="button-symbol">✦</span>
-      <span class="button-label">
-        <strong>친구 도감</strong>
-        <small id="collectionCount">1 / 8 발견</small>
-      </span>
-    </button>
-
-    <div class="side-note">
-      <span class="note-title">오늘의 소원</span>
-      <p id="questText">친구를 한 명 만나보세요.</p>
-      <div class="quest-track"><div id="questBar"></div></div>
+  <section class="zoom-panel" aria-label="맵 확대 및 축소">
+    <span class="zoom-title">맵 배율</span>
+    <div class="zoom-controls">
+      <button id="zoomOut" type="button" aria-label="맵 축소" title="맵 축소">−</button>
+      <label class="zoom-input-wrap">
+        <input id="zoomLevel" type="number" min="65" max="160" step="1" value="100"
+          inputmode="numeric" aria-label="확대 배율 (65%~160%)" title="65~160 사이 배율을 입력하세요" />
+        <span aria-hidden="true">%</span>
+      </label>
+      <button id="zoomIn" type="button" aria-label="맵 확대" title="맵 확대">+</button>
+      <button id="zoomReset" type="button" aria-label="맵 크기 초기화" title="맵 크기 초기화">초기화</button>
     </div>
-  </aside>
+  </section>
 
   <section class="resident-panel">
     <div class="resident-heading">
       <strong>마을에 찾아온 친구들</strong>
-      <span>친구를 눌러 찾거나, 맵에서 잡아 옮겨 보세요</span>
+      <span>보유한 친구만 표시 · 숫자를 입력해 인원 조절</span>
+    </div>
+    <div class="collection-actions" aria-label="캐릭터 관리">
+      <button id="randomSummon" type="button" disabled>랜덤 소환</button>
+      <button id="summonAll" type="button" disabled>전부 소환</button>
+      <button id="fuseCharacters" type="button" disabled>합성 (3)</button>
+      <button id="clearResidents" type="button" disabled>모두 내보내기</button>
+      <button id="resetGame" type="button" hidden>전체 초기화</button>
     </div>
     <div class="resident-list" id="collection"></div>
   </section>
@@ -116,6 +151,86 @@
         <button class="close-button" data-close="codexModal" aria-label="닫기">×</button>
       </div>
       <div class="codex-list" id="codexList"></div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="fusionModal">
+    <section class="modal fusion-modal" role="dialog" aria-modal="true" aria-labelledby="fusionTitle">
+      <div class="modal-header">
+        <div>
+          <h2 id="fusionTitle">🧪 친구 합성</h2>
+          <p>합성할 캐릭터를 골라 총 3마리를 넣어주세요.</p>
+        </div>
+        <button class="close-button" data-close="fusionModal" aria-label="닫기">×</button>
+      </div>
+      <div class="fusion-selection-count" id="fusionSelectionCount">선택 0 / 3</div>
+      <div class="fusion-materials" id="fusionMaterials" aria-live="polite"></div>
+      <div class="fusion-list" id="fusionList"></div>
+      <button class="primary-button" id="fusionConfirm" type="button" disabled>캐릭터 3마리 합성하기</button>
+      <div class="fusion-completion" id="fusionCompletion" aria-live="polite">
+        <h3>합성 완료!</h3>
+        <div class="fusion-used" id="fusionUsed"></div>
+        <div class="fusion-result-character">
+          <img id="fusionResultImage" alt="">
+          <strong id="fusionResultName"></strong>
+          <span id="fusionResultRarity"></span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="miniGamesModal">
+    <section class="modal mini-games-modal" role="dialog" aria-modal="true" aria-labelledby="miniGamesTitle">
+      <div class="modal-header">
+        <div>
+          <h2 id="miniGamesTitle">🎮 겨울 미니게임</h2>
+          <p>하고 싶은 놀이를 선택해보세요.</p>
+        </div>
+        <button class="close-button" data-close="miniGamesModal" aria-label="닫기">×</button>
+      </div>
+
+      <div id="miniGameMenu" class="mini-game-menu"></div>
+      <section id="miniGamePanel" class="mini-game-panel" hidden>
+        <p id="miniGameStatus" class="mini-game-status"></p>
+        <div id="miniGameContent"></div>
+        <button id="miniGameRestart" class="mini-game-secondary" type="button">다시 하기</button>
+      </section>
+
+      <button id="miniGameBack" class="mini-game-back" type="button" hidden>게임 선택으로</button>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="profileModal">
+    <section class="modal profile-modal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+      <div class="modal-header">
+        <div>
+          <h2 id="profileTitle">내 프로필</h2>
+          <p>마을에 보여줄 나만의 프로필을 꾸며보세요.</p>
+        </div>
+        <button class="close-button" data-close="profileModal" aria-label="닫기">×</button>
+      </div>
+      <div class="profile-avatar-preview" id="profileAvatarPreview" aria-label="프로필 사진 미리보기">✳</div>
+      <label class="profile-field">
+        <span>프로필 사진</span>
+        <input id="profilePhotoInput" type="file" accept="image/*">
+      </label>
+      <label class="profile-field">
+        <span>보유 캐릭터로 프로필 꾸미기</span>
+        <select id="profileCharacter"></select>
+      </label>
+      <label class="profile-field">
+        <span>표시 이름</span>
+        <input id="profileNameInput" type="text" maxlength="24" placeholder="이름을 입력하세요">
+      </label>
+      <label class="profile-field">
+        <span>상태 메시지 <small id="profileStatusCount">0/80</small></span>
+        <textarea id="profileStatusInput" maxlength="80" rows="3" placeholder="오늘의 기분이나 인사를 남겨보세요."></textarea>
+      </label>
+      <div class="profile-actions">
+        <button id="profileClearPhoto" class="mini-game-secondary" type="button">기본 사진으로</button>
+        <button id="profileSave" class="profile-save-button" type="button">프로필 저장</button>
+      </div>
+      <p class="profile-local-note">프로필 정보와 사진은 이 기기에만 저장됩니다.</p>
     </section>
   </div>
 </body>
